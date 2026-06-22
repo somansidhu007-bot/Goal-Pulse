@@ -6,431 +6,435 @@
   <title>GoalPulse — World Football Scores</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-
   <style>
-    /* ===== TOKENS ===== */
     :root {
-      --pitch-black: #0a0e1a;
-      --deep-navy:   #0d1526;
-      --card-bg:     #111827;
-      --border:      #1e2d45;
-      --grass-green: #00e676;
-      --grass-glow:  #00e67622;
-      --live-red:    #ff3b3b;
-      --live-glow:   #ff3b3b33;
-      --gold:        #ffd700;
-      --text-primary:   #f0f4ff;
-      --text-secondary: #8899bb;
-      --text-muted:     #4a5a7a;
-      --font-display: 'Barlow Condensed', sans-serif;
-      --font-body:    'Inter', sans-serif;
+      --pitch-black:#0a0e1a; --deep-navy:#0d1526; --card-bg:#111827; --border:#1e2d45;
+      --grass-green:#00e676; --grass-glow:#00e67622; --live-red:#ff3b3b; --live-glow:#ff3b3b33;
+      --gold:#ffd700; --text-primary:#f0f4ff; --text-secondary:#8899bb; --text-muted:#4a5a7a;
+      --font-display:'Barlow Condensed',sans-serif; --font-body:'Inter',sans-serif;
     }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      background: var(--pitch-black);
-      color: var(--text-primary);
-      font-family: var(--font-body);
-      font-size: 14px;
-      min-height: 100vh;
-    }
-
-    /* ===== HEADER ===== */
-    .site-header {
-      background: var(--deep-navy);
-      border-bottom: 2px solid var(--grass-green);
-      position: sticky; top: 0; z-index: 100;
-      box-shadow: 0 4px 24px rgba(0,230,118,0.08);
-    }
-    .header-inner {
-      max-width: 1200px; margin: 0 auto; padding: 0 16px;
-      height: 60px; display: flex; align-items: center; gap: 16px;
-    }
-    .logo {
-      display: flex; align-items: center; gap: 8px;
-      font-family: var(--font-display); font-size: 22px; font-weight: 600;
-      color: var(--text-primary); white-space: nowrap;
-    }
-    .logo strong { color: var(--grass-green); }
-    .tab-nav { display: flex; gap: 2px; flex: 1; }
-    .tab {
-      background: none; border: none; color: var(--text-secondary);
-      font-family: var(--font-display); font-size: 14px; font-weight: 600;
-      letter-spacing: 0.04em; text-transform: uppercase;
-      padding: 6px 10px; border-radius: 4px; cursor: pointer; transition: all 0.2s;
-    }
-    .tab:hover { color: var(--text-primary); background: var(--border); }
-    .tab.active {
-      color: var(--grass-green); background: var(--grass-glow);
-      border-bottom: 2px solid var(--grass-green);
-    }
-    .header-meta { display: flex; align-items: center; gap: 10px; margin-left: auto; }
-    .live-badge {
-      background: var(--live-red); color: #fff;
-      font-family: var(--font-display); font-size: 11px; font-weight: 800;
-      letter-spacing: 0.1em; padding: 3px 8px; border-radius: 3px;
-      animation: pulse 2s infinite;
-    }
-    .clock {
-      font-family: var(--font-display); font-size: 15px;
-      color: var(--text-secondary); min-width: 55px;
-    }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
-
-    /* ===== TICKER ===== */
-    .ticker-wrap {
-      background: var(--grass-green); overflow: hidden;
-      height: 30px; display: flex; align-items: center;
-    }
-    .ticker-track {
-      display: flex; animation: ticker 35s linear infinite; white-space: nowrap;
-    }
-    .ticker-item {
-      font-family: var(--font-display); font-size: 12px; font-weight: 700;
-      color: var(--pitch-black); padding: 0 48px; letter-spacing: 0.04em;
-    }
-    @keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-
-    /* ===== LAYOUT ===== */
-    .main-grid {
-      max-width: 1200px; margin: 0 auto; padding: 20px 16px;
-      display: grid; grid-template-columns: 1fr 300px; gap: 20px;
-    }
-
-    /* ===== SECTION HEADER ===== */
-    .section-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 14px; flex-wrap: wrap; gap: 8px;
-    }
-    .section-header h2 {
-      font-family: var(--font-display); font-size: 20px; font-weight: 800;
-      letter-spacing: 0.05em; text-transform: uppercase;
-    }
-    .filter-row { display: flex; gap: 8px; align-items: center; }
-    .filter-select {
-      background: var(--card-bg); border: 1px solid var(--border);
-      color: var(--text-primary); font-size: 12px; padding: 5px 8px;
-      border-radius: 6px; cursor: pointer; outline: none;
-    }
-    .filter-select:focus { border-color: var(--grass-green); }
-    .refresh-btn {
-      background: var(--card-bg); border: 1px solid var(--border);
-      color: var(--grass-green); font-family: var(--font-display);
-      font-size: 13px; font-weight: 700; padding: 5px 12px;
-      border-radius: 6px; cursor: pointer; transition: all 0.2s;
-    }
-    .refresh-btn:hover { background: var(--grass-glow); border-color: var(--grass-green); }
-
-    /* ===== MATCH CARDS ===== */
-    .matches-container { display: flex; flex-direction: column; gap: 3px; }
-    .competition-group { margin-bottom: 18px; }
-    .competition-label {
-      font-family: var(--font-display); font-size: 11px; font-weight: 800;
-      letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted);
-      padding: 6px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 4px;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .competition-label::before {
-      content: ''; display: inline-block; width: 8px; height: 8px;
-      background: var(--grass-green); border-radius: 50%;
-    }
-    .match-card {
-      background: var(--card-bg); border: 1px solid var(--border);
-      border-radius: 8px; padding: 12px 14px;
-      display: grid; grid-template-columns: 1fr auto 1fr;
-      align-items: center; gap: 10px;
-      cursor: pointer; transition: all 0.2s;
-      position: relative; overflow: hidden;
-    }
-    .match-card::before {
-      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
-      width: 3px; background: var(--border); transition: background 0.2s;
-    }
-    .match-card:hover { border-color: var(--grass-green); background: #141f32; transform: translateX(2px); }
-    .match-card:hover::before { background: var(--grass-green); }
-    .match-card.live::before { background: var(--live-red); }
-    .match-card.live { border-color: #2d1515; }
-
-    .team { display: flex; flex-direction: column; gap: 3px; }
-    .team.home { align-items: flex-end; text-align: right; }
-    .team.away { align-items: flex-start; text-align: left; }
-    .team-flag { font-size: 26px; line-height: 1; }
-    .team-name {
-      font-family: var(--font-display); font-size: 15px; font-weight: 700;
-      letter-spacing: 0.03em; color: var(--text-primary);
-    }
-
-    .score-center {
-      display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 75px;
-    }
-    .scoreline {
-      font-family: var(--font-display); font-size: 30px; font-weight: 800;
-      letter-spacing: 0.08em; color: var(--text-primary); line-height: 1;
-    }
-    .match-status {
-      font-family: var(--font-display); font-size: 10px; font-weight: 700;
-      letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 7px; border-radius: 3px;
-    }
-    .status-live { background: var(--live-glow); color: var(--live-red); animation: pulse 2s infinite; }
-    .status-ft   { color: var(--text-muted); }
-    .status-ns   { color: var(--grass-green); background: var(--grass-glow); }
-    .status-ht   { color: var(--gold); background: #2a2200; }
-    .match-time  { font-size: 11px; color: var(--text-muted); }
-
-    .match-events {
-      grid-column: 1 / -1; display: flex; justify-content: space-between;
-      padding-top: 8px; border-top: 1px solid var(--border); margin-top: 2px;
-    }
-    .events-home, .events-away { display: flex; flex-direction: column; gap: 2px; font-size: 11px; color: var(--text-secondary); }
-    .events-away { align-items: flex-end; }
-
-    /* ===== STATES ===== */
-    .state-msg {
-      text-align: center; padding: 50px 20px; color: var(--text-muted);
-      font-family: var(--font-display); font-size: 18px; letter-spacing: 0.05em;
-    }
-    .spinner {
-      width: 32px; height: 32px; border: 3px solid var(--border);
-      border-top-color: var(--grass-green); border-radius: 50%;
-      animation: spin 0.8s linear infinite; margin: 0 auto 14px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ===== SIDEBAR ===== */
-    .sidebar { display: flex; flex-direction: column; gap: 14px; }
-    .widget {
-      background: var(--card-bg); border: 1px solid var(--border);
-      border-radius: 8px; padding: 14px;
-    }
-    .widget-title {
-      font-family: var(--font-display); font-size: 13px; font-weight: 800;
-      letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary);
-      margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
-    }
-    .scorer-row {
-      display: grid; grid-template-columns: 18px 1fr auto auto;
-      align-items: center; gap: 7px; padding: 6px 0; border-bottom: 1px solid var(--border);
-    }
-    .scorer-row:last-child { border-bottom: none; }
-    .scorer-rank { font-family: var(--font-display); font-size: 12px; font-weight: 800; color: var(--text-muted); text-align: center; }
-    .scorer-rank.gold { color: var(--gold); }
-    .scorer-info { display: flex; flex-direction: column; gap: 1px; }
-    .scorer-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
-    .scorer-team { font-size: 10px; color: var(--text-muted); }
-    .scorer-flag { font-size: 15px; }
-    .scorer-goals { font-family: var(--font-display); font-size: 17px; font-weight: 800; color: var(--grass-green); }
-
-    .standings-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    .standings-table th {
-      font-family: var(--font-display); font-size: 10px; font-weight: 700;
-      letter-spacing: 0.08em; color: var(--text-muted); text-align: right; padding: 3px 3px;
-    }
-    .standings-table th:first-child { text-align: left; }
-    .standings-table td {
-      padding: 5px 3px; text-align: right; border-bottom: 1px solid var(--border);
-      color: var(--text-secondary);
-    }
-    .standings-table td:first-child { text-align: left; color: var(--text-primary); font-weight: 600; }
-    .standings-table tr:last-child td { border-bottom: none; }
-    .standings-table .pts { color: var(--grass-green); font-weight: 700; font-family: var(--font-display); font-size: 13px; }
-    .standings-table .pos { color: var(--text-muted); font-size: 10px; }
-
-    .upcoming-row {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 7px 0; border-bottom: 1px solid var(--border); gap: 8px;
-    }
-    .upcoming-row:last-child { border-bottom: none; }
-    .upcoming-teams { font-size: 12px; font-weight: 600; color: var(--text-primary); }
-    .upcoming-competition { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
-    .upcoming-time { font-family: var(--font-display); font-size: 12px; font-weight: 700; color: var(--grass-green); white-space: nowrap; }
-
-    /* ===== API NOTICE ===== */
-    .api-notice {
-      background: #111827; border: 1px dashed var(--grass-green);
-      border-radius: 8px; padding: 16px; margin-bottom: 16px;
-      font-size: 13px; color: var(--text-secondary); line-height: 1.6;
-    }
-    .api-notice strong { color: var(--grass-green); }
-    .api-notice code {
-      background: #0a0e1a; color: var(--gold); padding: 2px 6px;
-      border-radius: 4px; font-size: 12px; font-family: monospace;
-    }
-    .api-notice a { color: var(--grass-green); }
-
-    /* ===== FOOTER ===== */
-    .site-footer {
-      background: var(--deep-navy); border-top: 1px solid var(--border);
-      text-align: center; padding: 18px; color: var(--text-muted);
-      font-size: 12px; margin-top: 30px;
-    }
-    .site-footer a { color: var(--grass-green); text-decoration: none; }
-
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 860px) {
-      .main-grid { grid-template-columns: 1fr; }
-      .sidebar { order: -1; }
-    }
-    @media (max-width: 540px) {
-      .tab { padding: 5px 7px; font-size: 12px; }
-      .logo span:last-child { display: none; }
-      .scoreline { font-size: 24px; }
-      .team-flag { font-size: 20px; }
-      .team-name { font-size: 13px; }
-    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--pitch-black);color:var(--text-primary);font-family:var(--font-body);font-size:14px;min-height:100vh}
+    .site-header{background:var(--deep-navy);border-bottom:2px solid var(--grass-green);position:sticky;top:0;z-index:100;box-shadow:0 4px 24px rgba(0,230,118,.08)}
+    .header-inner{max-width:1200px;margin:0 auto;padding:0 16px;height:60px;display:flex;align-items:center;gap:16px}
+    .logo{display:flex;align-items:center;gap:8px;font-family:var(--font-display);font-size:22px;font-weight:600;white-space:nowrap}
+    .logo strong{color:var(--grass-green)}
+    .tab-nav{display:flex;gap:2px;flex:1}
+    .tab{background:none;border:none;color:var(--text-secondary);font-family:var(--font-display);font-size:14px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:6px 10px;border-radius:4px;cursor:pointer;transition:all .2s}
+    .tab:hover{color:var(--text-primary);background:var(--border)}
+    .tab.active{color:var(--grass-green);background:var(--grass-glow);border-bottom:2px solid var(--grass-green)}
+    .header-meta{display:flex;align-items:center;gap:10px;margin-left:auto}
+    .live-badge{background:var(--live-red);color:#fff;font-family:var(--font-display);font-size:11px;font-weight:800;letter-spacing:.1em;padding:3px 8px;border-radius:3px;animation:pulse 2s infinite}
+    .clock{font-family:var(--font-display);font-size:15px;color:var(--text-secondary);min-width:55px}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+    .ticker-wrap{background:var(--grass-green);overflow:hidden;height:30px;display:flex;align-items:center}
+    .ticker-track{display:flex;animation:ticker 35s linear infinite;white-space:nowrap}
+    .ticker-item{font-family:var(--font-display);font-size:12px;font-weight:700;color:var(--pitch-black);padding:0 48px;letter-spacing:.04em}
+    @keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+    .main-grid{max-width:1200px;margin:0 auto;padding:20px 16px;display:grid;grid-template-columns:1fr 300px;gap:20px}
+    .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+    .section-header h2{font-family:var(--font-display);font-size:20px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+    .filter-row{display:flex;gap:8px;align-items:center}
+    .filter-select{background:var(--card-bg);border:1px solid var(--border);color:var(--text-primary);font-size:12px;padding:5px 8px;border-radius:6px;cursor:pointer;outline:none}
+    .refresh-btn{background:var(--card-bg);border:1px solid var(--border);color:var(--grass-green);font-family:var(--font-display);font-size:13px;font-weight:700;padding:5px 12px;border-radius:6px;cursor:pointer;transition:all .2s}
+    .refresh-btn:hover{background:var(--grass-glow);border-color:var(--grass-green)}
+    .matches-container{display:flex;flex-direction:column;gap:3px}
+    .competition-group{margin-bottom:18px}
+    .competition-label{font-family:var(--font-display);font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);padding:6px 0 8px;border-bottom:1px solid var(--border);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+    .competition-label::before{content:'';display:inline-block;width:8px;height:8px;background:var(--grass-green);border-radius:50%}
+    .match-card{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+    .match-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--border);transition:background .2s}
+    .match-card:hover{border-color:var(--grass-green);background:#141f32;transform:translateX(2px)}
+    .match-card:hover::before{background:var(--grass-green)}
+    .match-card.live::before{background:var(--live-red)}
+    .match-card.live{border-color:#2d1515}
+    .team{display:flex;flex-direction:column;gap:3px}
+    .team.home{align-items:flex-end;text-align:right}
+    .team.away{align-items:flex-start;text-align:left}
+    .team-flag{font-size:26px;line-height:1}
+    .team-name{font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:.03em;color:var(--text-primary)}
+    .score-center{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:75px}
+    .scoreline{font-family:var(--font-display);font-size:30px;font-weight:800;letter-spacing:.08em;color:var(--text-primary);line-height:1}
+    .match-status{font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:3px}
+    .status-live{background:var(--live-glow);color:var(--live-red);animation:pulse 2s infinite}
+    .status-ft{color:var(--text-muted)}
+    .status-ns{color:var(--grass-green);background:var(--grass-glow)}
+    .status-ht{color:var(--gold);background:#2a2200}
+    .match-time{font-size:11px;color:var(--text-muted)}
+    .match-events{grid-column:1/-1;display:flex;justify-content:space-between;padding-top:8px;border-top:1px solid var(--border);margin-top:2px}
+    .events-home,.events-away{display:flex;flex-direction:column;gap:2px;font-size:11px;color:var(--text-secondary)}
+    .events-away{align-items:flex-end}
+    .state-msg{text-align:center;padding:50px 20px;color:var(--text-muted);font-family:var(--font-display);font-size:18px;letter-spacing:.05em}
+    .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--grass-green);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .sidebar{display:flex;flex-direction:column;gap:14px}
+    .widget{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:14px}
+    .widget-title{font-family:var(--font-display);font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+    .scorer-row{display:grid;grid-template-columns:18px 1fr auto auto;align-items:center;gap:7px;padding:6px 0;border-bottom:1px solid var(--border)}
+    .scorer-row:last-child{border-bottom:none}
+    .scorer-rank{font-family:var(--font-display);font-size:12px;font-weight:800;color:var(--text-muted);text-align:center}
+    .scorer-rank.gold{color:var(--gold)}
+    .scorer-info{display:flex;flex-direction:column;gap:1px}
+    .scorer-name{font-size:12px;font-weight:600;color:var(--text-primary)}
+    .scorer-team{font-size:10px;color:var(--text-muted)}
+    .scorer-flag{font-size:15px}
+    .scorer-goals{font-family:var(--font-display);font-size:17px;font-weight:800;color:var(--grass-green)}
+    .standings-table{width:100%;border-collapse:collapse;font-size:12px}
+    .standings-table th{font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text-muted);text-align:right;padding:3px}
+    .standings-table th:first-child{text-align:left}
+    .standings-table td{padding:5px 3px;text-align:right;border-bottom:1px solid var(--border);color:var(--text-secondary)}
+    .standings-table td:first-child{text-align:left;color:var(--text-primary);font-weight:600}
+    .standings-table tr:last-child td{border-bottom:none}
+    .standings-table .pts{color:var(--grass-green);font-weight:700;font-family:var(--font-display);font-size:13px}
+    .upcoming-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);gap:8px}
+    .upcoming-row:last-child{border-bottom:none}
+    .upcoming-teams{font-size:12px;font-weight:600;color:var(--text-primary)}
+    .upcoming-competition{font-size:10px;color:var(--text-muted);margin-top:1px}
+    .upcoming-time{font-family:var(--font-display);font-size:12px;font-weight:700;color:var(--grass-green);white-space:nowrap}
+    .api-notice{background:#111827;border:1px dashed var(--grass-green);border-radius:8px;padding:14px;margin-bottom:14px;font-size:13px;color:var(--text-secondary);line-height:1.6}
+    .api-notice strong{color:var(--grass-green)}
+    .api-notice code{background:#0a0e1a;color:var(--gold);padding:2px 6px;border-radius:4px;font-size:12px;font-family:monospace}
+    .api-notice a{color:var(--grass-green)}
+    .site-footer{background:var(--deep-navy);border-top:1px solid var(--border);text-align:center;padding:18px;color:var(--text-muted);font-size:12px;margin-top:30px}
+    .site-footer a{color:var(--grass-green);text-decoration:none}
+    @media(max-width:860px){.main-grid{grid-template-columns:1fr}.sidebar{order:-1}}
+    @media(max-width:540px){.tab{padding:5px 7px;font-size:12px}.scoreline{font-size:24px}.team-flag{font-size:20px}.team-name{font-size:13px}}
   </style>
 </head>
 <body>
 
-  <!-- HEADER -->
-  <header class="site-header">
-    <div class="header-inner">
-      <div class="logo">⚽ <span>Goal<strong>Pulse</strong></span></div>
-      <nav class="tab-nav">
-        <button class="tab active" data-tab="live">🔴 Live</button>
-        <button class="tab" data-tab="today">Today</button>
-        <button class="tab" data-tab="upcoming">Upcoming</button>
-        <button class="tab" data-tab="results">Results</button>
-      </nav>
-      <div class="header-meta">
-        <span class="live-badge">LIVE</span>
-        <span id="clock" class="clock"></span>
-      </div>
-    </div>
-  </header>
-
-  <!-- TICKER -->
-  <div class="ticker-wrap">
-    <div class="ticker-track">
-      <span class="ticker-item">🏆 FIFA World Cup 2026 · Qualifiers ongoing</span>
-      <span class="ticker-item">🌍 UEFA Nations League · Semi-Finals</span>
-      <span class="ticker-item">🏅 Copa America · Results available</span>
-      <span class="ticker-item">⚡ AFCON 2025 · Group Stage</span>
-      <span class="ticker-item">🌐 World Rankings updated weekly</span>
-      <span class="ticker-item">🏆 FIFA World Cup 2026 · Qualifiers ongoing</span>
-      <span class="ticker-item">🌍 UEFA Nations League · Semi-Finals</span>
-      <span class="ticker-item">🏅 Copa America · Results available</span>
-      <span class="ticker-item">⚡ AFCON 2025 · Group Stage</span>
-      <span class="ticker-item">🌐 World Rankings updated weekly</span>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo">⚽ <span>Goal<strong>Pulse</strong></span></div>
+    <nav class="tab-nav">
+      <button class="tab active" data-tab="live">🔴 Live</button>
+      <button class="tab" data-tab="today">Today</button>
+      <button class="tab" data-tab="upcoming">Upcoming</button>
+      <button class="tab" data-tab="results">Results</button>
+    </nav>
+    <div class="header-meta">
+      <span class="live-badge">LIVE</span>
+      <span id="clock" class="clock"></span>
     </div>
   </div>
+</header>
 
-  <!-- MAIN -->
-  <main class="main-grid">
-    <section class="matches-col">
-      <div class="section-header">
-        <h2 id="section-title">Live Matches</h2>
-        <div class="filter-row">
-          <select id="competition-filter" class="filter-select">
-            <option value="all">All Competitions</option>
-            <option value="World Cup">World Cup</option>
-            <option value="Nations League">Nations League</option>
-            <option value="Copa">Copa América</option>
-            <option value="AFCON">AFCON</option>
-            <option value="Friendly">Internationals</option>
-          </select>
-          <button class="refresh-btn" id="refresh-btn">↻ Refresh</button>
-        </div>
+<div class="ticker-wrap">
+  <div class="ticker-track">
+    <span class="ticker-item">🏆 FIFA World Cup 2026 · Qualifiers ongoing</span>
+    <span class="ticker-item">🌍 UEFA Nations League · Semi-Finals</span>
+    <span class="ticker-item">🏅 Copa America · Results available</span>
+    <span class="ticker-item">⚡ AFCON 2025 · Group Stage</span>
+    <span class="ticker-item">🌐 World Rankings updated weekly</span>
+    <span class="ticker-item">🏆 FIFA World Cup 2026 · Qualifiers ongoing</span>
+    <span class="ticker-item">🌍 UEFA Nations League · Semi-Finals</span>
+    <span class="ticker-item">🏅 Copa America · Results available</span>
+    <span class="ticker-item">⚡ AFCON 2025 · Group Stage</span>
+    <span class="ticker-item">🌐 World Rankings updated weekly</span>
+  </div>
+</div>
+
+<main class="main-grid">
+  <section class="matches-col">
+    <div class="section-header">
+      <h2 id="section-title">Live Matches</h2>
+      <div class="filter-row">
+        <select id="competition-filter" class="filter-select">
+          <option value="all">All Competitions</option>
+          <option value="World Cup">World Cup</option>
+          <option value="Nations League">Nations League</option>
+          <option value="Copa">Copa América</option>
+          <option value="AFCON">AFCON</option>
+          <option value="Friendly">Internationals</option>
+        </select>
+        <button class="refresh-btn" id="refresh-btn">↻ Refresh</button>
       </div>
-      <div id="matches-container" class="matches-container"></div>
-    </section>
+    </div>
+    <div id="matches-container" class="matches-container"></div>
+  </section>
 
-    <aside class="sidebar">
-      <div class="widget">
-        <h3 class="widget-title">🥇 Top Scorers</h3>
-        <div id="scorers-list"></div>
-      </div>
-      <div class="widget">
-        <h3 class="widget-title">📊 Group Standings</h3>
-        <div id="standings-widget"></div>
-      </div>
-      <div class="widget">
-        <h3 class="widget-title">📅 Coming Up</h3>
-        <div id="upcoming-widget"></div>
-      </div>
-    </aside>
-  </main>
+  <aside class="sidebar">
+    <div class="widget">
+      <h3 class="widget-title">🥇 Top Scorers</h3>
+      <div id="scorers-list"></div>
+    </div>
+    <div class="widget">
+      <h3 class="widget-title">📊 Group Standings</h3>
+      <div id="standings-widget"></div>
+    </div>
+    <div class="widget">
+      <h3 class="widget-title">📅 Coming Up</h3>
+      <div id="upcoming-widget"></div>
+    </div>
+  </aside>
+</main>
 
-  <footer class="site-footer">
-    GoalPulse &copy; 2026 · Data via <a href="https://www.football-data.org" target="_blank">Football-Data.org</a> · Built for fans
-  </footer>
+<footer class="site-footer">
+  GoalPulse &copy; 2026 &middot; Data via <a href="https://www.football-data.org" target="_blank">Football-Data.org</a> &middot; Built for fans
+</footer>
 
-  <script>
-    // ============================================================
-    // CONFIG — paste your free API key from football-data.org here
-    // ============================================================
-    const API_KEY  = "YOUR_API_KEY_HERE";
-    const USE_DEMO = API_KEY === "YOUR_API_KEY_HERE";
+<script>
+// ── CONFIG ──────────────────────────────────────────────────
+// Paste your free API key from football-data.org here to get live scores
+// Leave blank to show demo data
+var API_KEY = "";
 
-    // ============================================================
-    // DEMO DATA
-    // ============================================================
-    const DATA = {
-      live: [
-        { competition: "FIFA World Cup 2026 Qualifier", matches: [
-          { id:1, status:"LIVE", minute:"67'", home:{name:"Brazil",     flag:"🇧🇷", goals:2, scorers:["Vinicius Jr. 23'","Rodrygo 55'"]}, away:{name:"Argentina", flag:"🇦🇷", goals:1, scorers:["Messi 41'"]} },
-          { id:2, status:"LIVE", minute:"34'", home:{name:"France",     flag:"🇫🇷", goals:0, scorers:[]},                               away:{name:"Spain",     flag:"🇪🇸", goals:1, scorers:["Yamal 29'"]} },
-          { id:3, status:"HT",   minute:"HT",  home:{name:"England",    flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿", goals:1, scorers:["Bellingham 38'"]},              away:{name:"Germany",   flag:"🇩🇪", goals:1, scorers:["Musiala 27'"]} },
-        ]},
-        { competition: "UEFA Nations League", matches: [
-          { id:4, status:"LIVE", minute:"78'", home:{name:"Portugal",   flag:"🇵🇹", goals:3, scorers:["Ronaldo 12'","Bruno 44'","Leao 71'"]}, away:{name:"Netherlands",flag:"🇳🇱", goals:1, scorers:["Depay 61'"]} },
-        ]},
-      ],
-      today: [
-        { competition: "International Friendly", matches: [
-          { id:5, status:"FT", minute:"", home:{name:"Italy",   flag:"🇮🇹", goals:2, scorers:["Chiesa 15'","Scamacca 80'"]}, away:{name:"Belgium",    flag:"🇧🇪", goals:0, scorers:[]} },
-          { id:6, status:"FT", minute:"", home:{name:"Japan",   flag:"🇯🇵", goals:1, scorers:["Mitoma 55'"]},               away:{name:"South Korea",flag:"🇰🇷", goals:1, scorers:["Son 77'"]} },
-        ]},
-        { competition: "CONMEBOL Qualifying", matches: [
-          { id:7, status:"NS", minute:"20:00", home:{name:"Uruguay",  flag:"🇺🇾", goals:null, scorers:[]}, away:{name:"Colombia", flag:"🇨🇴", goals:null, scorers:[]} },
-        ]},
-      ],
-      upcoming: [
-        { competition: "FIFA World Cup 2026 Qualifier", matches: [
-          { id:8, status:"NS", minute:"Tomorrow 19:00", home:{name:"USA",     flag:"🇺🇸", goals:null, scorers:[]}, away:{name:"Mexico",  flag:"🇲🇽", goals:null, scorers:[]} },
-          { id:9, status:"NS", minute:"Wed 20:45",      home:{name:"Morocco", flag:"🇲🇦", goals:null, scorers:[]}, away:{name:"Senegal", flag:"🇸🇳", goals:null, scorers:[]} },
-        ]},
-      ],
-      results: [
-        { competition: "UEFA Euro 2024", matches: [
-          { id:10, status:"FT", minute:"", home:{name:"Spain",   flag:"🇪🇸", goals:2, scorers:["Morata 25'","Oyarzabal 86'"]}, away:{name:"England", flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿", goals:1, scorers:["Palmer 73'"]} },
-          { id:11, status:"FT", minute:"", home:{name:"Germany", flag:"🇩🇪", goals:2, scorers:["Fullkrug 89'","Havertz 45'"]}, away:{name:"Denmark", flag:"🇩🇰", goals:0, scorers:[]} },
-        ]},
-      ],
-    };
+// ── DEMO DATA ───────────────────────────────────────────────
+var DATA = {
+  live: [
+    { competition: "FIFA World Cup 2026 Qualifier", matches: [
+      { id:1, status:"LIVE", minute:"67'",
+        home:{name:"Brazil",    flag:"🇧🇷", goals:2, scorers:["Vinicius Jr. 23'","Rodrygo 55'"]},
+        away:{name:"Argentina", flag:"🇦🇷", goals:1, scorers:["Messi 41'"]} },
+      { id:2, status:"LIVE", minute:"34'",
+        home:{name:"France", flag:"🇫🇷", goals:0, scorers:[]},
+        away:{name:"Spain",  flag:"🇪🇸", goals:1, scorers:["Yamal 29'"]} },
+      { id:3, status:"HT", minute:"HT",
+        home:{name:"England", flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿", goals:1, scorers:["Bellingham 38'"]},
+        away:{name:"Germany", flag:"🇩🇪", goals:1, scorers:["Musiala 27'"]} }
+    ]},
+    { competition: "UEFA Nations League", matches: [
+      { id:4, status:"LIVE", minute:"78'",
+        home:{name:"Portugal",    flag:"🇵🇹", goals:3, scorers:["Ronaldo 12'","Bruno 44'","Leao 71'"]},
+        away:{name:"Netherlands", flag:"🇳🇱", goals:1, scorers:["Depay 61'"]} }
+    ]}
+  ],
+  today: [
+    { competition: "International Friendly", matches: [
+      { id:5, status:"FT", minute:"",
+        home:{name:"Italy",  flag:"🇮🇹", goals:2, scorers:["Chiesa 15'","Scamacca 80'"]},
+        away:{name:"Belgium",flag:"🇧🇪", goals:0, scorers:[]} },
+      { id:6, status:"FT", minute:"",
+        home:{name:"Japan",      flag:"🇯🇵", goals:1, scorers:["Mitoma 55'"]},
+        away:{name:"South Korea",flag:"🇰🇷", goals:1, scorers:["Son 77'"]} }
+    ]},
+    { competition: "CONMEBOL Qualifying", matches: [
+      { id:7, status:"NS", minute:"20:00",
+        home:{name:"Uruguay", flag:"🇺🇾", goals:null, scorers:[]},
+        away:{name:"Colombia",flag:"🇨🇴", goals:null, scorers:[]} }
+    ]}
+  ],
+  upcoming: [
+    { competition: "FIFA World Cup 2026 Qualifier", matches: [
+      { id:8, status:"NS", minute:"Tomorrow 19:00",
+        home:{name:"USA",    flag:"🇺🇸", goals:null, scorers:[]},
+        away:{name:"Mexico", flag:"🇲🇽", goals:null, scorers:[]} },
+      { id:9, status:"NS", minute:"Wed 20:45",
+        home:{name:"Morocco",flag:"🇲🇦", goals:null, scorers:[]},
+        away:{name:"Senegal",flag:"🇸🇳", goals:null, scorers:[]} }
+    ]}
+  ],
+  results: [
+    { competition: "UEFA Euro 2024", matches: [
+      { id:10, status:"FT", minute:"",
+        home:{name:"Spain",  flag:"🇪🇸", goals:2, scorers:["Morata 25'","Oyarzabal 86'"]},
+        away:{name:"England",flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿", goals:1, scorers:["Palmer 73'"]} },
+      { id:11, status:"FT", minute:"",
+        home:{name:"Germany",flag:"🇩🇪", goals:2, scorers:["Fullkrug 89'","Havertz 45'"]},
+        away:{name:"Denmark",flag:"🇩🇰", goals:0, scorers:[]} }
+    ]}
+  ]
+};
 
-    const SCORERS = [
-      { rank:1, name:"Kylian Mbappé",     team:"France",    flag:"🇫🇷", goals:8 },
-      { rank:2, name:"Cristiano Ronaldo", team:"Portugal",  flag:"🇵🇹", goals:7 },
-      { rank:3, name:"Erling Haaland",    team:"Norway",    flag:"🇳🇴", goals:6 },
-      { rank:4, name:"Harry Kane",        team:"England",   flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿", goals:6 },
-      { rank:5, name:"Lautaro Martínez",  team:"Argentina", flag:"🇦🇷", goals:5 },
-    ];
+var SCORERS = [
+  {rank:1,name:"Kylian Mbappe",    team:"France",    flag:"🇫🇷",goals:8},
+  {rank:2,name:"Cristiano Ronaldo",team:"Portugal",  flag:"🇵🇹",goals:7},
+  {rank:3,name:"Erling Haaland",   team:"Norway",    flag:"🇳🇴",goals:6},
+  {rank:4,name:"Harry Kane",       team:"England",   flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",goals:6},
+  {rank:5,name:"Lautaro Martinez", team:"Argentina", flag:"🇦🇷",goals:5}
+];
 
-    const STANDINGS = [
-      { pos:1, team:"🇧🇷 Brazil",    played:8, gd:"+15", pts:22 },
-      { pos:2, team:"🇦🇷 Argentina", played:8, gd:"+12", pts:20 },
-      { pos:3, team:"🇺🇾 Uruguay",   played:8, gd:"+4",  pts:15 },
-      { pos:4, team:"🇨🇴 Colombia",  played:8, gd:"+1",  pts:14 },
-      { pos:5, team:"🇪🇨 Ecuador",   played:8, gd:"-2",  pts:10 },
-    ];
+var STANDINGS = [
+  {pos:1,team:"🇧🇷 Brazil",   played:8,gd:"+15",pts:22},
+  {pos:2,team:"🇦🇷 Argentina",played:8,gd:"+12",pts:20},
+  {pos:3,team:"🇺🇾 Uruguay",  played:8,gd:"+4", pts:15},
+  {pos:4,team:"🇨🇴 Colombia", played:8,gd:"+1", pts:14},
+  {pos:5,team:"🇪🇨 Ecuador",  played:8,gd:"-2", pts:10}
+];
 
-    const UPCOMING_SIDEBAR = [
-      { home:"🇺🇸 USA",     away:"🇲🇽 Mexico",  competition:"WC Qualifier",   time:"Tomorrow" },
-      { home:"🇲🇦 Morocco", away:"🇸🇳 Senegal", competition:"AFCON Qualifier", time:"Wed" },
-      { home:"🇮🇹 Italy",   away:"🇫🇷 France",  competition:"Nations League",  time:"Thu 20:45" },
-      { home:"🇯🇵 Japan",   away:"🇦🇺 Australia",competition:"AFC Qualifier",  time:"Fri 14:00" },
-    ];
+var UPCOMING_SIDEBAR = [
+  {home:"🇺🇸 USA",    away:"🇲🇽 Mexico", competition:"WC Qualifier",   time:"Tomorrow"},
+  {home:"🇲🇦 Morocco",away:"🇸🇳 Senegal",competition:"AFCON Qualifier",time:"Wed"},
+  {home:"🇮🇹 Italy",  away:"🇫🇷 France", competition:"Nations League", time:"Thu 20:45"},
+  {home:"🇯🇵 Japan",  away:"🇦🇺 Australia",competition:"AFC Qualifier",time:"Fri 14:00"}
+];
 
-    // ============================================================
-    // STATE
-    // ============================================================
-    let currentTab    = "live";
-    let currentFilter = "all";
-    let refreshTimer  = null;
+// ── STATE ───────────────────────────────────────────────────
+var currentTab = "live";
+var currentFilter = "all";
+var refreshTimer = null;
 
-    // ============================================================
-    // CLOCK
-    // ============================================================
-    function updateClock() {
-      document.getEle
+// ── CLOCK ───────────────────────────────────────────────────
+function updateClock(){
+  document.getElementById("clock").textContent =
+    new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+}
+setInterval(updateClock,1000);
+updateClock();
+
+// ── TABS ────────────────────────────────────────────────────
+document.querySelectorAll(".tab").forEach(function(btn){
+  btn.addEventListener("click",function(){
+    document.querySelectorAll(".tab").forEach(function(b){b.classList.remove("active")});
+    btn.classList.add("active");
+    currentTab = btn.getAttribute("data-tab");
+    var titles={live:"Live Matches",today:"Today's Matches",upcoming:"Upcoming",results:"Recent Results"};
+    document.getElementById("section-title").textContent = titles[currentTab];
+    loadMatches();
+  });
+});
+
+document.getElementById("competition-filter").addEventListener("change",function(e){
+  currentFilter = e.target.value;
+  loadMatches();
+});
+
+document.getElementById("refresh-btn").addEventListener("click",function(){
+  loadMatches();
+});
+
+// ── RENDER ──────────────────────────────────────────────────
+function statusBadge(status,minute){
+  if(status==="LIVE") return '<span class="match-status status-live">LIVE '+(minute||"")+'</span>';
+  if(status==="HT")   return '<span class="match-status status-ht">HT</span>';
+  if(status==="FT")   return '<span class="match-status status-ft">FT</span>';
+  if(status==="NS")   return '<span class="match-status status-ns">'+(minute||"Soon")+'</span>';
+  return '<span class="match-status status-ft">'+status+'</span>';
+}
+
+function scoreDisplay(home,away,status){
+  if(status==="NS") return '<span class="scoreline">vs</span>';
+  return '<span class="scoreline">'+(home||0)+' - '+(away||0)+'</span>';
+}
+
+function goalsList(scorers){
+  if(!scorers||!scorers.length) return "";
+  return scorers.map(function(s){return "<div>⚽ "+s+"</div>"}).join("");
+}
+
+function renderCard(match){
+  var home=match.home, away=match.away, status=match.status, minute=match.minute;
+  var isLive=(status==="LIVE");
+  var hasEvents=(home.scorers&&home.scorers.length)||(away.scorers&&away.scorers.length);
+  var eventsHtml="";
+  if(hasEvents){
+    eventsHtml='<div class="match-events"><div class="events-home">'+goalsList(home.scorers)+'</div><div class="events-away">'+goalsList(away.scorers)+'</div></div>';
+  }
+  return '<div class="match-card'+(isLive?" live":"")+'">'+
+    '<div class="team home"><span class="team-flag">'+(home.flag||"🏳️")+'</span><span class="team-name">'+home.name+'</span></div>'+
+    '<div class="score-center">'+scoreDisplay(home.goals,away.goals,status)+statusBadge(status,minute)+
+    (status==="NS"?'<span class="match-time">'+(minute||"")+'</span>':"")+
+    '</div>'+
+    '<div class="team away"><span class="team-flag">'+(away.flag||"🏳️")+'</span><span class="team-name">'+away.name+'</span></div>'+
+    eventsHtml+'</div>';
+}
+
+function renderGroups(groups){
+  var filtered=groups;
+  if(currentFilter!=="all"){
+    filtered=groups.filter(function(g){
+      return g.competition.toLowerCase().indexOf(currentFilter.toLowerCase())>=0;
+    });
+  }
+  if(!filtered.length) return '<div class="state-msg">No matches found</div>';
+  return filtered.map(function(g){
+    return '<div class="competition-group"><div class="competition-label">'+g.competition+'</div>'+
+      g.matches.map(renderCard).join("")+'</div>';
+  }).join("");
+}
+ 
+// ── LOAD MATCHES ────────────────────────────────────────────
+function loadMatches(){
+  clearInterval(refreshTimer);
+  var container=document.getElementById("matches-container");
+  container.innerHTML='<div class="state-msg"><div class="spinner"></div>Loading matches...</div>';
+ 
+  // Small delay to show spinner, then render
+  setTimeout(function(){
+    var groups = DATA[currentTab] || [];
+ 
+    if(API_KEY && API_KEY.length > 5){
+      // Fetch from real API
+      fetchAPI(groups, container);
+    } else {
+      // Show demo data
+      container.innerHTML=
+        '<div class="api-notice">'+
+        '<strong>⚽ Demo Mode</strong> — Showing sample data.<br>'+
+        'Get a free API key at <a href="https://www.football-data.org" target="_blank">football-data.org</a> '+
+        'and paste it in the <code>API_KEY</code> variable at the top of the script.'+
+        '</div>'+renderGroups(groups);
+    }
+ 
+    if(currentTab==="live"){
+      refreshTimer=setInterval(loadMatches,60000);
+    }
+  }, 300);
+}
+ 
+function fetchAPI(fallbackGroups, container){
+  var today=new Date().toISOString().split("T")[0];
+  var endpoints={
+    live:"matches?status=LIVE",
+    today:"matches?dateFrom="+today+"&dateTo="+today,
+    upcoming:"matches?dateFrom="+today+"&dateTo="+shiftDate(today,7),
+    results:"matches?dateFrom="+shiftDate(today,-7)+"&dateTo="+today+"&status=FINISHED"
+  };
+  fetch("https://api.football-data.org/v4/"+endpoints[currentTab],{
+    headers:{"X-Auth-Token":API_KEY}
+  })
+  .then(function(r){return r.json()})
+  .then(function(data){
+    var groups={};
+    (data.matches||[]).forEach(function(m){
+      var key=m.competition&&m.competition.name?m.competition.name:"International";
+      if(!groups[key]) groups[key]=[];
+      var st=m.status==="IN_PLAY"?"LIVE":m.status==="PAUSED"?"HT":m.status==="FINISHED"?"FT":"NS";
+      groups[key].push({
+        id:m.id,status:st,
+        minute:m.minute?m.minute+"'":new Date(m.utcDate).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}),
+        home:{name:m.homeTeam&&m.homeTeam.name||"Home",flag:"🏳️",goals:m.score&&m.score.fullTime&&m.score.fullTime.home,scorers:[]},
+        away:{name:m.awayTeam&&m.awayTeam.name||"Away",flag:"🏳️",goals:m.score&&m.score.fullTime&&m.score.fullTime.away,scorers:[]}
+      });
+    });
+    var result=Object.keys(groups).map(function(k){return{competition:k,matches:groups[k]}});
+    container.innerHTML=result.length?renderGroups(result):'<div class="state-msg">No matches right now</div>';
+  })
+  .catch(function(err){
+    container.innerHTML='<div class="api-notice"><strong>⚠️ API Error:</strong> '+err.message+'</div>'+renderGroups(fallbackGroups);
+  });
+}
+ 
+function shiftDate(d,days){
+  var dt=new Date(d);dt.setDate(dt.getDate()+days);return dt.toISOString().split("T")[0];
+}
+ 
+// ── SIDEBAR ─────────────────────────────────────────────────
+function loadSidebar(){
+  document.getElementById("scorers-list").innerHTML=SCORERS.map(function(s){
+    return '<div class="scorer-row">'+
+      '<span class="scorer-rank'+(s.rank===1?" gold":"")+'">'+s.rank+'</span>'+
+      '<div class="scorer-info"><span class="scorer-name">'+s.name+'</span><span class="scorer-team">'+s.team+'</span></div>'+
+      '<span class="scorer-flag">'+s.flag+'</span>'+
+      '<span class="scorer-goals">'+s.goals+'</span></div>';
+  }).join("");
+ 
+  document.getElementById("standings-widget").innerHTML=
+    '<table class="standings-table"><thead><tr><th>#</th><th>Team</th><th>P</th><th>GD</th><th>Pts</th></tr></thead><tbody>'+
+    STANDINGS.map(function(r){
+      return '<tr><td>'+r.pos+'</td><td>'+r.team+'</td><td>'+r.played+'</td><td>'+r.gd+'</td><td class="pts">'+r.pts+'</td></tr>';
+    }).join("")+'</tbody></table>';
+  document.getElementById("upcoming-widget").innerHTML=UPCOMING_SIDEBAR.map(function(u){
+    return '<div class="upcoming-row">'+
+      '<div><div class="upcoming-teams">'+u.home+' vs '+u.away+'</div>'+
+      '<div class="upcoming-competition">'+u.competition+'</div></div>'+
+      '<span class="upcoming-time">'+u.time+'</span></div>';
+  }).join("");
+}
+ 
+// ── INIT ────────────────────────────────────────────────────
+loadMatches();
+loadSidebar();
+</script>
+</body>
+</html>
