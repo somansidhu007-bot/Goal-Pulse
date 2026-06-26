@@ -91,10 +91,10 @@
     .upcoming-teams{font-size:12px;font-weight:600;color:var(--text-primary)}
     .upcoming-competition{font-size:10px;color:var(--text-muted);margin-top:1px}
     .upcoming-time{font-family:var(--font-display);font-size:12px;font-weight:700;color:var(--grass-green);white-space:nowrap}
-    .api-notice{background:#111827;border:1px dashed var(--grass-green);border-radius:8px;padding:14px;margin-bottom:14px;font-size:13px;color:var(--text-secondary);line-height:1.6}
-    .api-notice strong{color:var(--grass-green)}
-    .api-notice code{background:#0a0e1a;color:var(--gold);padding:2px 6px;border-radius:4px;font-size:12px;font-family:monospace}
-    .api-notice a{color:var(--grass-green)}
+    .notice{background:#111827;border:1px dashed var(--grass-green);border-radius:8px;padding:14px;margin-bottom:14px;font-size:13px;color:var(--text-secondary);line-height:1.6}
+    .notice strong{color:var(--grass-green)}
+    .notice.error{border-color:var(--live-red)}
+    .notice.error strong{color:var(--live-red)}
     .site-footer{background:var(--deep-navy);border-top:1px solid var(--border);text-align:center;padding:18px;color:var(--text-muted);font-size:12px;margin-top:30px}
     .site-footer a{color:var(--grass-green);text-decoration:none}
     @media(max-width:860px){.main-grid{grid-template-columns:1fr}.sidebar{order:-1}}
@@ -143,7 +143,7 @@
           <option value="all">All Competitions</option>
           <option value="World Cup">World Cup</option>
           <option value="Nations League">Nations League</option>
-          <option value="Copa">Copa América</option>
+          <option value="Copa">Copa America</option>
           <option value="AFCON">AFCON</option>
           <option value="Friendly">Internationals</option>
         </select>
@@ -174,66 +174,19 @@
 </footer>
 
 <script>
-// ── CONFIG ──────────────────────────────────────────────────
-// Paste your free API key from football-data.org here to get live scores
-// Leave blank to show demo data
-var API_KEY = "cd387d0f3bcb44268a14bda3cc1f0b95";
-
-// ── DEMO DATA ───────────────────────────────────────────────
-var DATA = {
-  live: [
-    { competition: "FIFA World Cup 2026 Qualifier", matches: [
-      { id:1, status:"LIVE", minute:"67'",
-        home:{name:"Brazil",    flag:"🇧🇷", goals:2, scorers:["Vinicius Jr. 23'","Rodrygo 55'"]},
-        away:{name:"Argentina", flag:"🇦🇷", goals:1, scorers:["Messi 41'"]} },
-      { id:2, status:"LIVE", minute:"34'",
-        home:{name:"France", flag:"🇫🇷", goals:0, scorers:[]},
-        away:{name:"Spain",  flag:"🇪🇸", goals:1, scorers:["Yamal 29'"]} },
-      { id:3, status:"HT", minute:"HT",
-        home:{name:"England", flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿", goals:1, scorers:["Bellingham 38'"]},
-        away:{name:"Germany", flag:"🇩🇪", goals:1, scorers:["Musiala 27'"]} }
-    ]},
-    { competition: "UEFA Nations League", matches: [
-      { id:4, status:"LIVE", minute:"78'",
-        home:{name:"Portugal",    flag:"🇵🇹", goals:3, scorers:["Ronaldo 12'","Bruno 44'","Leao 71'"]},
-        away:{name:"Netherlands", flag:"🇳🇱", goals:1, scorers:["Depay 61'"]} }
-    ]}
-  ],
-  today: [
-    { competition: "International Friendly", matches: [
-      { id:5, status:"FT", minute:"",
-        home:{name:"Italy",  flag:"🇮🇹", goals:2, scorers:["Chiesa 15'","Scamacca 80'"]},
-        away:{name:"Belgium",flag:"🇧🇪", goals:0, scorers:[]} },
-      { id:6, status:"FT", minute:"",
-        home:{name:"Japan",      flag:"🇯🇵", goals:1, scorers:["Mitoma 55'"]},
-        away:{name:"South Korea",flag:"🇰🇷", goals:1, scorers:["Son 77'"]} }
-    ]},
-    { competition: "CONMEBOL Qualifying", matches: [
-      { id:7, status:"NS", minute:"20:00",
-        home:{name:"Uruguay", flag:"🇺🇾", goals:null, scorers:[]},
-        away:{name:"Colombia",flag:"🇨🇴", goals:null, scorers:[]} }
-    ]}
-  ],
-  upcoming: [
-    { competition: "FIFA World Cup 2026 Qualifier", matches: [
-      { id:8, status:"NS", minute:"Tomorrow 19:00",
-        home:{name:"USA",    flag:"🇺🇸", goals:null, scorers:[]},
-        away:{name:"Mexico", flag:"🇲🇽", goals:null, scorers:[]} },
-      { id:9, status:"NS", minute:"Wed 20:45",
-        home:{name:"Morocco",flag:"🇲🇦", goals:null, scorers:[]},
-        away:{name:"Senegal",flag:"🇸🇳", goals:null, scorers:[]} }
-    ]}
-  ],
-  results: [
-    { competition: "UEFA Euro 2024", matches: [
-      { id:10, status:"FT", minute:"",
-        home:{name:"Spain",  flag:"🇪🇸", goals:2, scorers:["Morata 25'","Oyarzabal 86'"]},
-        away:{name:"England",flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿", goals:1, scorers:["Palmer 73'"]} },
-      { id:11, status:"FT", minute:"",
-        home:{name:"Germany",flag:"🇩🇪", goals:2, scorers:["Fullkrug 89'","Havertz 45'"]},
-        away:{name:"Denmark",flag:"🇩🇰", goals:0, scorers:[]} }
-    ]}
-  ]
+var FLAG_MAP = {
+  "Brazil":"🇧🇷","Argentina":"🇦🇷","France":"🇫🇷","Spain":"🇪🇸","Germany":"🇩🇪",
+  "England":"🏴󠁧󠁢󠁥󠁮󠁧󠁿","Portugal":"🇵🇹","Netherlands":"🇳🇱","Italy":"🇮🇹","Belgium":"🇧🇪",
+  "Croatia":"🇭🇷","Denmark":"🇩🇰","Uruguay":"🇺🇾","Colombia":"🇨🇴","Chile":"🇨🇱",
+  "Ecuador":"🇪🇨","Mexico":"🇲🇽","United States":"🇺🇸","Japan":"🇯🇵","Korea Republic":"🇰🇷",
+  "Australia":"🇦🇺","Morocco":"🇲🇦","Senegal":"🇸🇳","Nigeria":"🇳🇬","Ghana":"🇬🇭",
+  "Cameroon":"🇨🇲","Egypt":"🇪🇬","Poland":"🇵🇱","Switzerland":"🇨🇭","Sweden":"🇸🇪",
+  "Norway":"🇳🇴","Serbia":"🇷🇸","Turkey":"🇹🇷","Ukraine":"🇺🇦","Iran":"🇮🇷",
+  "Saudi Arabia":"🇸🇦","Algeria":"🇩🇿","Tunisia":"🇹🇳","Ivory Coast":"🇨🇮",
+  "Paraguay":"🇵🇾","Peru":"🇵🇪","Venezuela":"🇻🇪","Bolivia":"🇧🇴","Costa Rica":"🇨🇷",
+  "Panama":"🇵🇦","Jamaica":"🇯🇲","Canada":"🇨🇦","Wales":"🏴󠁧󠁢󠁷󠁬󠁳󠁿","Scotland":"🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+  "Austria":"🇦🇹","Czech Republic":"🇨🇿","Hungary":"🇭🇺","Romania":"🇷🇴","Slovakia":"🇸🇰",
+  "Slovenia":"🇸🇮","Albania":"🇦🇱","Georgia":"🇬🇪","Greece":"🇬🇷"
 };
 
 var SCORERS = [
@@ -259,12 +212,11 @@ var UPCOMING_SIDEBAR = [
   {home:"🇯🇵 Japan",  away:"🇦🇺 Australia",competition:"AFC Qualifier",time:"Fri 14:00"}
 ];
 
-// ── STATE ───────────────────────────────────────────────────
 var currentTab = "live";
 var currentFilter = "all";
 var refreshTimer = null;
 
-// ── CLOCK ───────────────────────────────────────────────────
+// Clock
 function updateClock(){
   document.getElementById("clock").textContent =
     new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
@@ -272,7 +224,7 @@ function updateClock(){
 setInterval(updateClock,1000);
 updateClock();
 
-// ── TABS ────────────────────────────────────────────────────
+// Tabs
 document.querySelectorAll(".tab").forEach(function(btn){
   btn.addEventListener("click",function(){
     document.querySelectorAll(".tab").forEach(function(b){b.classList.remove("active")});
@@ -293,8 +245,10 @@ document.getElementById("refresh-btn").addEventListener("click",function(){
   loadMatches();
 });
 
-// ── RENDER ──────────────────────────────────────────────────
-function statusBadge(status,minute){
+// Render helpers
+function getFlag(name){ return FLAG_MAP[name] || "🏳️"; }
+
+function statusBadge(status, minute){
   if(status==="LIVE") return '<span class="match-status status-live">LIVE '+(minute||"")+'</span>';
   if(status==="HT")   return '<span class="match-status status-ht">HT</span>';
   if(status==="FT")   return '<span class="match-status status-ft">FT</span>';
@@ -302,9 +256,9 @@ function statusBadge(status,minute){
   return '<span class="match-status status-ft">'+status+'</span>';
 }
 
-function scoreDisplay(home,away,status){
+function scoreDisplay(home, away, status){
   if(status==="NS") return '<span class="scoreline">vs</span>';
-  return '<span class="scoreline">'+(home||0)+' - '+(away||0)+'</span>';
+  return '<span class="scoreline">'+(home!=null?home:0)+' - '+(away!=null?away:0)+'</span>';
 }
 
 function goalsList(scorers){
@@ -321,97 +275,94 @@ function renderCard(match){
     eventsHtml='<div class="match-events"><div class="events-home">'+goalsList(home.scorers)+'</div><div class="events-away">'+goalsList(away.scorers)+'</div></div>';
   }
   return '<div class="match-card'+(isLive?" live":"")+'">'+
-    '<div class="team home"><span class="team-flag">'+(home.flag||"🏳️")+'</span><span class="team-name">'+home.name+'</span></div>'+
+    '<div class="team home"><span class="team-flag">'+home.flag+'</span><span class="team-name">'+home.name+'</span></div>'+
     '<div class="score-center">'+scoreDisplay(home.goals,away.goals,status)+statusBadge(status,minute)+
     (status==="NS"?'<span class="match-time">'+(minute||"")+'</span>':"")+
     '</div>'+
-    '<div class="team away"><span class="team-flag">'+(away.flag||"🏳️")+'</span><span class="team-name">'+away.name+'</span></div>'+
+    '<div class="team away"><span class="team-flag">'+away.flag+'</span><span class="team-name">'+away.name+'</span></div>'+
     eventsHtml+'</div>';
 }
 
 function renderGroups(groups){
-  var filtered=groups;
-  if(currentFilter!=="all"){
-    filtered=groups.filter(function(g){
-      return g.competition.toLowerCase().indexOf(currentFilter.toLowerCase())>=0;
+  var filtered = groups;
+  if(currentFilter !== "all"){
+    filtered = groups.filter(function(g){
+      return g.competition.toLowerCase().indexOf(currentFilter.toLowerCase()) >= 0;
     });
   }
-  if(!filtered.length) return '<div class="state-msg">No matches found</div>';
+  if(!filtered.length) return '<div class="state-msg">No matches found for this filter</div>';
   return filtered.map(function(g){
     return '<div class="competition-group"><div class="competition-label">'+g.competition+'</div>'+
       g.matches.map(renderCard).join("")+'</div>';
   }).join("");
 }
- 
-// ── LOAD MATCHES ────────────────────────────────────────────
+
+function parseMatches(data){
+  var groups = {};
+  var matches = data.matches || [];
+  matches.forEach(function(m){
+    var key = (m.competition && m.competition.name) ? m.competition.name : "International";
+    if(!groups[key]) groups[key] = [];
+    var st = m.status;
+    if(st==="IN_PLAY") st="LIVE";
+    else if(st==="PAUSED") st="HT";
+    else if(st==="FINISHED") st="FT";
+    else if(st==="TIMED"||st==="SCHEDULED") st="NS";
+    var kickoff = "";
+    try { kickoff = new Date(m.utcDate).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}); } catch(e){}
+    groups[key].push({
+      id: m.id,
+      status: st,
+      minute: m.minute ? m.minute+"'" : kickoff,
+      home: {
+        name:  (m.homeTeam && m.homeTeam.name) ? m.homeTeam.name : "Home",
+        flag:  getFlag((m.homeTeam && m.homeTeam.name) ? m.homeTeam.name : ""),
+        goals: (m.score && m.score.fullTime) ? m.score.fullTime.home : null,
+        scorers: []
+      },
+      away: {
+        name:  (m.awayTeam && m.awayTeam.name) ? m.awayTeam.name : "Away",
+        flag:  getFlag((m.awayTeam && m.awayTeam.name) ? m.awayTeam.name : ""),
+        goals: (m.score && m.score.fullTime) ? m.score.fullTime.away : null,
+        scorers: []
+      }
+    });
+  });
+  return Object.keys(groups).map(function(k){ return {competition:k, matches:groups[k]}; });
+}
+
 function loadMatches(){
   clearInterval(refreshTimer);
-  var container=document.getElementById("matches-container");
-  container.innerHTML='<div class="state-msg"><div class="spinner"></div>Loading matches...</div>';
- 
-  // Small delay to show spinner, then render
-  setTimeout(function(){
-    var groups = DATA[currentTab] || [];
- 
-    if(API_KEY && API_KEY.length > 5){
-      // Fetch from real API
-      fetchAPI(groups, container);
-    } else {
-      // Show demo data
-      container.innerHTML=
-        '<div class="api-notice">'+
-        '<strong>⚽ Demo Mode</strong> — Showing sample data.<br>'+
-        'Get a free API key at <a href="https://www.football-data.org" target="_blank">football-data.org</a> '+
-        'and paste it in the <code>API_KEY</code> variable at the top of the script.'+
-        '</div>'+renderGroups(groups);
-    }
- 
-    if(currentTab==="live"){
-      refreshTimer=setInterval(loadMatches,60000);
-    }
-  }, 300);
-}
- 
-function fetchAPI(fallbackGroups, container){
-  var today=new Date().toISOString().split("T")[0];
-  var endpoints={
-    live:"matches?status=LIVE",
-    today:"matches?dateFrom="+today+"&dateTo="+today,
-    upcoming:"matches?dateFrom="+today+"&dateTo="+shiftDate(today,7),
-    results:"matches?dateFrom="+shiftDate(today,-7)+"&dateTo="+today+"&status=FINISHED"
-  };
-  fetch("https://api.football-data.org/v4/"+endpoints[currentTab],{
-    headers:{"X-Auth-Token":API_KEY}
-  })
-  .then(function(r){return r.json()})
-  .then(function(data){
-    var groups={};
-    (data.matches||[]).forEach(function(m){
-      var key=m.competition&&m.competition.name?m.competition.name:"International";
-      if(!groups[key]) groups[key]=[];
-      var st=m.status==="IN_PLAY"?"LIVE":m.status==="PAUSED"?"HT":m.status==="FINISHED"?"FT":"NS";
-      groups[key].push({
-        id:m.id,status:st,
-        minute:m.minute?m.minute+"'":new Date(m.utcDate).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}),
-        home:{name:m.homeTeam&&m.homeTeam.name||"Home",flag:"🏳️",goals:m.score&&m.score.fullTime&&m.score.fullTime.home,scorers:[]},
-        away:{name:m.awayTeam&&m.awayTeam.name||"Away",flag:"🏳️",goals:m.score&&m.score.fullTime&&m.score.fullTime.away,scorers:[]}
-      });
+  var container = document.getElementById("matches-container");
+  container.innerHTML = '<div class="state-msg"><div class="spinner"></div>Loading matches...</div>';
+
+  fetch("/api/matches?tab=" + currentTab)
+    .then(function(r){
+      if(!r.ok) throw new Error("Server error: " + r.status);
+      return r.json();
+    })
+    .then(function(data){
+      if(data.error){ throw new Error(data.error); }
+      var groups = parseMatches(data);
+      if(groups.length === 0){
+        container.innerHTML = '<div class="state-msg">No matches right now — try Today or Upcoming tabs</div>';
+      } else {
+        container.innerHTML = renderGroups(groups);
+      }
+    })
+    .catch(function(err){
+      container.innerHTML =
+        '<div class="notice error"><strong>⚠️ Could not load matches</strong><br>'+err.message+'<br><br>'+
+        'Make sure the <code>api/matches.js</code> file is in your GitHub repo and Vercel has redeployed.</div>';
     });
-    var result=Object.keys(groups).map(function(k){return{competition:k,matches:groups[k]}});
-    container.innerHTML=result.length?renderGroups(result):'<div class="state-msg">No matches right now</div>';
-  })
-  .catch(function(err){
-    container.innerHTML='<div class="api-notice"><strong>⚠️ API Error:</strong> '+err.message+'</div>'+renderGroups(fallbackGroups);
-  });
+ 
+  if(currentTab === "live"){
+    refreshTimer = setInterval(loadMatches, 60000);
+  }
 }
  
-function shiftDate(d,days){
-  var dt=new Date(d);dt.setDate(dt.getDate()+days);return dt.toISOString().split("T")[0];
-}
- 
-// ── SIDEBAR ─────────────────────────────────────────────────
 function loadSidebar(){
-  document.getElementById("scorers-list").innerHTML=SCORERS.map(function(s){
+  document.getElementById("scorers-list").innerHTML = SCORERS.map(function(s){
     return '<div class="scorer-row">'+
       '<span class="scorer-rank'+(s.rank===1?" gold":"")+'">'+s.rank+'</span>'+
       '<div class="scorer-info"><span class="scorer-name">'+s.name+'</span><span class="scorer-team">'+s.team+'</span></div>'+
@@ -419,12 +370,12 @@ function loadSidebar(){
       '<span class="scorer-goals">'+s.goals+'</span></div>';
   }).join("");
  
-  document.getElementById("standings-widget").innerHTML=
+  document.getElementById("standings-widget").innerHTML =
     '<table class="standings-table"><thead><tr><th>#</th><th>Team</th><th>P</th><th>GD</th><th>Pts</th></tr></thead><tbody>'+
     STANDINGS.map(function(r){
       return '<tr><td>'+r.pos+'</td><td>'+r.team+'</td><td>'+r.played+'</td><td>'+r.gd+'</td><td class="pts">'+r.pts+'</td></tr>';
     }).join("")+'</tbody></table>';
-  document.getElementById("upcoming-widget").innerHTML=UPCOMING_SIDEBAR.map(function(u){
+  document.getElementById("upcoming-widget").innerHTML = UPCOMING_SIDEBAR.map(function(u){
     return '<div class="upcoming-row">'+
       '<div><div class="upcoming-teams">'+u.home+' vs '+u.away+'</div>'+
       '<div class="upcoming-competition">'+u.competition+'</div></div>'+
@@ -432,9 +383,8 @@ function loadSidebar(){
   }).join("");
 }
  
-// ── INIT ────────────────────────────────────────────────────
 loadMatches();
 loadSidebar();
 </script>
 </body>
-</html>
+</html> 
